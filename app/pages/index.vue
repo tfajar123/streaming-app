@@ -1,6 +1,15 @@
 <template>
   <div class="min-h-screen bg-black">
-    <CardsSection variant="main" />
+    <Swiper
+      :slides-per-view="1"
+      :modules="modules"
+      :effect="'fade'"
+      :loop="true"
+    >
+      <SwiperSlide v-for="(anime, index) in animeItems" :key="index"
+        ><CardsSection variant="main" :current-anime="anime"
+      /></SwiperSlide>
+    </Swiper>
     <section id="on-going" class="pb-10">
       <div>
         <div>
@@ -37,13 +46,9 @@
                 },
               }"
             >
-              <SwiperSlide><CardsMovie variant="onGoing" /> </SwiperSlide>
-              <SwiperSlide><CardsMovie variant="onGoing" /> </SwiperSlide>
-              <SwiperSlide><CardsMovie variant="onGoing" /> </SwiperSlide>
-              <SwiperSlide><CardsMovie variant="onGoing" /> </SwiperSlide>
-              <SwiperSlide><CardsMovie variant="onGoing" /> </SwiperSlide>
-              <SwiperSlide><CardsMovie variant="onGoing" /> </SwiperSlide>
-              <SwiperSlide><CardsMovie variant="onGoing" /> </SwiperSlide>
+              <SwiperSlide v-for="(anime, index) in animeItems" :key="index"
+                ><CardsMovie variant="onGoing" :anime-item="anime" />
+              </SwiperSlide>
             </Swiper>
           </div>
         </div>
@@ -79,21 +84,19 @@
                 },
               }"
             >
-              <SwiperSlide><CardsMovie variant="popular" /></SwiperSlide>
-              <SwiperSlide><CardsMovie variant="popular" /></SwiperSlide>
-              <SwiperSlide><CardsMovie variant="popular" /></SwiperSlide>
-              <SwiperSlide><CardsMovie variant="popular" /></SwiperSlide>
-              <SwiperSlide><CardsMovie variant="popular" /></SwiperSlide>
-              <SwiperSlide><CardsMovie variant="popular" /></SwiperSlide>
+              <SwiperSlide v-for="(anime, index) in animeItems" :key="index"
+                ><CardsMovie variant="popular" :anime-item="anime" />
+              </SwiperSlide>
             </Swiper>
           </div>
         </div>
       </div>
     </section>
-    <CardsSection variant="featured">
+    <CardsSection variant="featured" :current-anime="animeItems[activeIndex]">
       <Swiper
         :space-between="20"
         :modules="modules"
+        :free-mode="true"
         :autoplay="{
           delay: 5000,
           disableOnInteraction: false,
@@ -103,14 +106,11 @@
           500: { slidesPerView: 1.5 },
           1024: { slidesPerView: 2.5 },
         }"
+        @slide-change="onSlideChange"
       >
-        <SwiperSlide><CardsMovie variant="onGoing" /> </SwiperSlide>
-        <SwiperSlide><CardsMovie variant="onGoing" /> </SwiperSlide>
-        <SwiperSlide><CardsMovie variant="onGoing" /> </SwiperSlide>
-        <SwiperSlide><CardsMovie variant="onGoing" /> </SwiperSlide>
-        <SwiperSlide><CardsMovie variant="onGoing" /> </SwiperSlide>
-        <SwiperSlide><CardsMovie variant="onGoing" /> </SwiperSlide>
-        <SwiperSlide><CardsMovie variant="onGoing" /> </SwiperSlide>
+        <SwiperSlide v-for="(anime, index) in animeItems" :key="index"
+          ><CardsMovie variant="onGoing" :anime-item="anime" />
+        </SwiperSlide>
       </Swiper>
     </CardsSection>
 
@@ -147,12 +147,9 @@
               },
             }"
           >
-            <SwiperSlide><CardsMovie variant="movie" /></SwiperSlide>
-            <SwiperSlide><CardsMovie variant="movie" /></SwiperSlide>
-            <SwiperSlide><CardsMovie variant="movie" /></SwiperSlide>
-            <SwiperSlide><CardsMovie variant="movie" /></SwiperSlide>
-            <SwiperSlide><CardsMovie variant="movie" /></SwiperSlide>
-            <SwiperSlide><CardsMovie variant="movie" /></SwiperSlide>
+            <SwiperSlide v-for="(anime, index) in animeItems" :key="index"
+              ><CardsMovie variant="movie" :anime-item="anime" />
+            </SwiperSlide>
           </Swiper>
         </div>
       </div>
@@ -190,12 +187,9 @@
               },
             }"
           >
-            <SwiperSlide><CardsMovie variant="movie" /></SwiperSlide>
-            <SwiperSlide><CardsMovie variant="movie" /></SwiperSlide>
-            <SwiperSlide><CardsMovie variant="movie" /></SwiperSlide>
-            <SwiperSlide><CardsMovie variant="movie" /></SwiperSlide>
-            <SwiperSlide><CardsMovie variant="movie" /></SwiperSlide>
-            <SwiperSlide><CardsMovie variant="movie" /></SwiperSlide>
+            <SwiperSlide v-for="(anime, index) in animeItems" :key="index"
+              ><CardsMovie variant="movie" :anime-item="anime" />
+            </SwiperSlide>
           </Swiper>
         </div>
       </div>
@@ -205,12 +199,33 @@
 
 <script setup>
 import { Swiper, SwiperSlide } from 'swiper/vue';
-import { Autoplay, Navigation } from 'swiper/modules';
-
 import 'swiper/css';
+import 'swiper/css/effect-fade';
 import 'swiper/css/navigation';
+import { EffectFade, FreeMode, Autoplay, Navigation } from 'swiper/modules';
 
-const modules = [Autoplay, Navigation];
+import animeItemServices from '~/services/animeItemServices';
+
+const modules = [Autoplay, Navigation, FreeMode, EffectFade];
+
+const animeItems = reactive([]);
+
+const activeIndex = ref(0);
+
+function onSlideChange(swiper) {
+  activeIndex.value = swiper.activeIndex;
+}
+
+const fetchAnimesData = async () => {
+  try {
+    const result = await animeItemServices.getAnimeItems();
+    animeItems.push(...result);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+onMounted(fetchAnimesData);
 </script>
 
 <style></style>

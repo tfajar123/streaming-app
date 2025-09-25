@@ -1,7 +1,12 @@
 <template>
   <section
+    v-if="currentAnime?.image"
     :id="variant"
-    class="min-h-200 bg-[linear-gradient(rgba(0,0,0,1),rgba(0,0,0,0.8),rgba(0,0,0,1)),url('img/bg.jpg')] bg-cover bg-center"
+    class="min-h-200 bg-cover bg-center"
+    :style="{
+      backgroundImage: `linear-gradient(rgba(0,0,0,1),rgba(0,0,0,0.5),rgba(0,0,0,1)),
+                      url('http://localhost:8080/${currentAnime.image}')`,
+    }"
   >
     <div class="min-h-200 xl:ml-45 sm:ml-10 flex items-end justify-between">
       <div class="text-white pb-20 min-w-1/2 max-sm:pl-5">
@@ -19,20 +24,21 @@
         </div>
         <div class="max-sm:pr-5">
           <span class="px-3 py-2 bg-black rounded-xl">Anime-TV</span>
-          <h1 class="text-4xl font-bold mt-5">Naruto Shippuden</h1>
-          <p class="text-stone-400 my-2">2h40min | Action, Adventure</p>
+          <h1 class="text-4xl font-bold mt-5">{{ currentAnime.title }}</h1>
+          <p class="text-stone-400 my-2">
+            {{ currentAnime.type }} |
+            <span v-for="(genre, index) in currentAnime.genres" :key="index">
+              {{ genre
+              }}<span v-if="index < currentAnime.genres.length - 1">, </span>
+            </span>
+          </p>
           <p class="text-white mb-5 pr-10">
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Incidunt
-            vero nulla magni maiores a qui consequuntur, molestiae voluptatibus
-            magnam velit voluptates totam ducimus quibusdam optio facilis est et
-            error ullam provident sit? Hic aliquam consequatur, eius in ipsam
-            magnam sunt numquam quam! Soluta error ut consequatur magnam
-            doloribus quaerat cumque!
+            {{ currentAnime.description }}
           </p>
           <div class="flex gap-5 max-md:text-sm max-md:justify-center">
-            <ButtonsMain variant="watchNow" title="Watch Now" icon="watch" />
+            <ButtonsMain variant="primary" title="Watch Now" icon="watch" />
             <ButtonsMain
-              variant="favorite"
+              variant="secondary"
               title="Add to Favorite"
               icon="love"
             />
@@ -51,5 +57,9 @@
 <script setup>
 defineProps({
   variant: String,
+  currentAnime: {
+    type: Object,
+    default: () => ({}),
+  },
 });
 </script>

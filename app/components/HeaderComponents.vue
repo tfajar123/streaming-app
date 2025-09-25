@@ -11,9 +11,21 @@
         <li><NuxtLink to="/">Seasonal Anime</NuxtLink></li>
         <li><NuxtLink to="/">About</NuxtLink></li>
       </ul>
-      <ul class="hidden md:flex gap-7">
-        <li><Icon name="material-symbols:search" class="pt-7" /></li>
-        <li>Login</li>
+      <ul class="hidden md:flex gap-7 md:items-center">
+        <li>
+          <Icon
+            name="material-symbols:search"
+            class="scale-150 translate-y-0.5"
+          />
+        </li>
+        <li>
+          <ButtonsMain
+            variant="primary"
+            title="Login"
+            icon="none"
+            @click="showAuthModal = true"
+          />
+        </li>
       </ul>
       <div class="md:hidden z-90" @click="isOpen = !isOpen">
         <Icon name="material-symbols:menu" class="scale-150" />
@@ -37,10 +49,14 @@
       </div>
     </Transition>
   </nav>
+  <Transition name="slide">
+    <ModalsAuth v-if="showAuthModal" @close="showAuthModal = false" />
+  </Transition>
 </template>
 
 <script setup>
 const isOpen = ref(false);
+const showAuthModal = ref(false);
 
 onMounted(() => {
   window.addEventListener('scroll', () => {
